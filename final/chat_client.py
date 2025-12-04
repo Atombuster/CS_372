@@ -16,9 +16,11 @@ def usage():
 
 def receiving_thread(mysocket):
     while True:
+        #print_message("call recv")
         data = mysocket.recv(4096)
         
-        print_message(data.decode())
+        #print_message(data.decode())
+
         response = json.loads(data.decode('utf-8'))
         if response["type"] == "join":
             print_message(f"*** {response["nick"]} has joined the chat")

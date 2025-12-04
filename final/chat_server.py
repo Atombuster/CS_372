@@ -24,22 +24,28 @@ def run_server(port):
                 #print(f"({sock_client_socket},{sock_client_addr}): connected")
             else:
                 data = sock.recv(4096)
-                client_data = json.loads(data.decode('utf-8'))
+                
                 
                 if data == b"":
                     print(f"{sock.getpeername()}: disconnected")
+                    nick = nicknames.get(sock, "unknown")
+                    
                     read_fds.remove(sock)
-                    output_data = json.dumps({"type": "leave", "nick": client_data["nick"]})
+                    nicknames.pop(sock)
+                    output_data = json.dumps({"type": "leave", "nick": nick})
                     output = output_data.encode('utf-8')
-                    client.sendall(output)
+
+                    for client in read_fds:
+                        if client != s:
+                            client.sendall(output)
 
                     
                 else:
-                    
+                    client_data = json.loads(data.decode('utf-8'))
                     print(client_data)
                     output = ''
                     for client in read_fds:
-                        if client != s and client != sock:
+                        if client != s:
                             
                             if client_data['type'] == "hello":
                                 nicknames[sock] = client_data["nick"]
