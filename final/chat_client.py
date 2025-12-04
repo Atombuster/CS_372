@@ -20,7 +20,12 @@ def receiving_thread(mysocket):
         
         print_message(data.decode())
         response = json.loads(data.decode('utf-8'))
-        
+        if response["type"] == "join":
+            print_message(f"*** {response["nick"]} has joined the chat")
+        elif response["type"] == "leave":
+            print_message(f"*** {response["nick"]} has left the chat")
+        elif response["type"] == "chat":
+            print_message(f"{response["nick"]}: {response["message"]}")
 
 def main(argv):
     try:
@@ -52,6 +57,8 @@ def main(argv):
 
 
         chat_message = read_command(f"{name}> ")
+        if chat_message == "/q":
+            sys.exit()
 
         chat_payload = json.dumps({"type": "chat", "message": chat_message})
         chat_encode = chat_payload.encode('utf-8')
